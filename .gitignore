@@ -1,0 +1,6 @@
+*.p12
+envSignXml
+.env
+*.xml
+.vscode
+__pycache__
