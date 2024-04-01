@@ -5,7 +5,7 @@ El proyecto es una api creada en FastApi con python, dados los datos de la factu
 Si te sirve regalame una estrella. ⭐️⭐️⭐️⭐️
 
 ## Xades
-La librería Xades se usa para firmar el xml generado y esta echa en Java, funciona bien con -> openjdk version "1.8.0_402". Recomiendo que lo usen y sí lo hacen en docker lo configuren de esa forma.
+La librería Xades se usa para firmar el xml generado y esta echa en Java, funciona bien con -> jdk version "1.8.0_402". Recomiendo que lo usen y sí lo hacen en docker lo configuren de esa forma.
 
 ## Instalación
 
