@@ -8,6 +8,7 @@ from app.utils.create_xml import createXml
 from app.utils.sign_xml import sign_xml_file
 from app.utils.send_xml import send_xml_to_reception, send_xml_to_authorization
 from app.utils.control_temp_file import createTempXmlFile, createTempFile
+from app.utils.get_content_xml_file import get_content_xml_file
 from dotenv import dotenv_values
 
 routerInvoice = APIRouter()
@@ -26,16 +27,16 @@ async def sign_invoice(invoice: Invoice):
 
         # generate xml
         xmlData = createXml(info=invoice, accessKeyInvoice=accessKey)
-        file_name = str(accessKey) + '.xml'
+
+        # xml name
+        xmlFileName = str(accessKey) + '.xml'
+
         # xml string
         xmlString = xmlData['xmlString']
 
         # create temp files to create xml
-        xmlNoSigned = createTempXmlFile(xmlString, file_name)
-        xmlSigned = createTempXmlFile(xmlString, file_name)
-
-        # password of signature
-        passwordP12 = config['PASSWORD']
+        xmlNoSigned = createTempXmlFile(xmlString, xmlFileName)
+        xmlSigned = createTempXmlFile(xmlString, xmlFileName)
 
         # get digital signature
         certificateName = 'signature.p12'
@@ -45,20 +46,22 @@ async def sign_invoice(invoice: Invoice):
             certificateToSign = createTempFile(
                 digitalSignature, certificateName)
 
+        # password of signature
+        passwordP12 = config['PASSWORD']
         infoToSignXml = InfoToSignXml(
             pathXmlToSign=xmlNoSigned.name,
             pathXmlSigned=xmlSigned.name,
             pathSignatureP12=certificateToSign.name,
             passwordSignature=passwordP12)
 
-        # sign xml
+        # sign xml and creating temp file
         isXmlCreated = sign_xml_file(infoToSignXml)
-        print(isXmlCreated)
 
-        # send xml to reception
+        # url for reception and authorization
         urlReception = config["URL_RECEPTION"]
         urlAuthorization = config["URL_AUTHORIZATION"]
 
+        # send xml for reception
         isReceived = False
         if isXmlCreated:
             isReceived = await send_xml_to_reception(
@@ -66,19 +69,24 @@ async def sign_invoice(invoice: Invoice):
                 urlToReception=urlReception,
             )
 
+        # send xml for authorization
         isAuthorized = False
+        xmlSignedValue = None
         if isReceived:
             responseAuthorization = await send_xml_to_authorization(
                 accessKey,
                 urlAuthorization,
             )
             isAuthorized = responseAuthorization['isValid']
+            # get xml signed content
+            xmlSignedValue = responseAuthorization['xml']
 
         return {
             'result': {
                 'accessKey': accessKey,
                 'isReceived': isReceived,
-                'isAuthorized': isAuthorized
+                'isAuthorized': isAuthorized,
+                'xmlFileSigned': xmlSignedValue
             }
         }
     except Exception as e:

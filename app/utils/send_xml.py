@@ -24,6 +24,7 @@ async def send_xml_to_reception(pathXmlSigned: str, urlToReception: str):
 
     except Exception as e:
         logging.error('Error to send xml for reception: %s' % str(e))
+        return False
 
 
 async def send_xml_to_authorization(accessKey: str, urlToAuthorization: str):
@@ -35,15 +36,25 @@ async def send_xml_to_authorization(accessKey: str, urlToAuthorization: str):
 
             if status == 'AUTORIZADO' or status == 'EN PROCESO':
                 logging.info("Response authorization: ", status)
+
+                xml = result.autorizaciones.autorizacion[0].comprobante
                 return {
                     'isValid': True,
-                    'status': status
+                    'status': status,
+                    'xml': xml
                 }
             else:
                 logging.warning(result)
                 return {
                     'isValid': False,
-                    'status': status
+                    'status': status,
+                    'xml': None
                 }
     except Exception as e:
         logging.error('Error to send xml for reception: %s' % str(e))
+        return {
+            'isValid': False,
+            'status': status,
+            'xml': None,
+            'error': str(e)
+        }
