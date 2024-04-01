@@ -1,6 +1,8 @@
-# Firma electronica Sri con Xades
+# Firma electronica Sri con Xades Ecuador
 
-El proyecto es una api creada en FastApi con python, dados los datos de la factura permite generar el archivo xml firmado, enviarlo a recepción y autorización al SRI.
+El proyecto es una api creada en FastApi con python, dados los datos de la factura permite generar el archivo xml firmado, enviarlo a recepción y autorización al SRI, en la response obtendrás la clave de acceso del xml, el archivo firmado, y atributos que te dirán si el archivo fue recibido y autorizado. Nota: Es una base que te podría servir para tu proyecto ya que la idea es usarlo como micro-servicio.
+
+Si te sirve regalame una estrella.
 
 ## Instalación
 
@@ -16,4 +18,4 @@ Este proyecto fue inspirado por https://github.com/cmruizg777/FirmaElectronicaPy
 
 ## Contacto
 
-Para más información, puedes escribirme en [correo electrónico](mailto:omar.guanoluisa25@gmail.com).
+Para más información, recomendaciones o dudas puedes escribirme a [correo electrónico](mailto:omar.guanoluisa25@gmail.com).
