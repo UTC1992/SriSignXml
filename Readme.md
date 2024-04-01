@@ -2,7 +2,7 @@
 
 El proyecto es una api creada en FastApi con python, dados los datos de la factura permite generar el archivo xml firmado, enviarlo a recepción y autorización al SRI, en la response obtendrás la clave de acceso del xml, el archivo firmado, y atributos que te dirán si el archivo fue recibido y autorizado. Nota: Es una base que te podría servir para tu proyecto ya que la idea es usarlo como micro-servicio.
 
-Si te sirve regalame una estrella.
+Si te sirve regalame una estrella. ⭐️⭐️⭐️⭐️
 
 ## Instalación
 
