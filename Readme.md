@@ -7,6 +7,9 @@ Si te sirve regalame una estrella. ⭐️⭐️⭐️⭐️
 ## Xades
 La librería Xades se usa para firmar el xml generado y esta echa en Java, funciona bien con -> jdk version "1.8.0_402". Recomiendo que lo usen y sí lo hacen en docker lo configuren de esa forma.
 
+## Python
+La versión de Python con la que se creo es: Python 3.11.3
+
 ## Instalación
 
 1. Clonar el repositorio

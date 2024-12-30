@@ -31,6 +31,7 @@ pycodestyle==2.11.1
 pydantic==2.6.4
 pydantic_core==2.16.3
 pylint==3.1.0
+python-dotenv==1.0.1
 pytz==2024.1
 requests==2.31.0
 requests-file==2.0.0
