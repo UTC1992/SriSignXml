@@ -49,6 +49,7 @@ La versión de Python con la que se creo es: Python 3.11.3
 3. Colocar la firma electrónica en la carpeta app y nombrarla signature.p12 (p12 es la extensión del archivo)
 4. En el archivo env se encuentra la variable PASSWORD allí debes colocar la clave de tu firma electronica
 5. Correr la api con: uvicorn main:app --reload
+6. Acceder a Swagger UI en: `http://localhost:8000/docs` (puerto por defecto de Uvicorn)
 
 ## Ejecución con Docker (Sin Instalación Local)
 
