@@ -47,3 +47,4 @@ virtualenv==20.25.1
 xmltodict==0.13.0
 yarl==1.9.4
 zeep==4.2.1
+httpx==0.25.2
