@@ -10,6 +10,38 @@ La librería Xades se usa para firmar el xml generado y esta echa en Java, funci
 ## Python
 La versión de Python con la que se creo es: Python 3.11.3
 
+## Requisitos para Instalación Local
+
+- Python 3.11
+- Java JDK 1.8 (para la librería Xades)
+
+## Instalación de Java
+
+### Windows
+1. Descarga JDK 1.8 desde el sitio oficial de Oracle o AdoptOpenJDK.
+2. Instala el JDK.
+3. Configura las variables de entorno:
+   - Ve a "Propiedades del sistema" > "Variables de entorno".
+   - Agrega `JAVA_HOME` con la ruta de instalación (ej: `C:\Program Files\Java\jdk1.8.0_402`).
+   - Agrega `%JAVA_HOME%\bin` al `PATH`.
+
+### Mac
+1. Instala Homebrew si no lo tienes: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+2. Instala JDK 1.8: `brew install openjdk@8`
+3. Configura las variables:
+   - Agrega a `~/.zshrc` o `~/.bash_profile`: `export JAVA_HOME=/usr/local/opt/openjdk@8/libexec/openjdk.jdk/Contents/Home`
+   - Agrega `export PATH=$JAVA_HOME/bin:$PATH`
+   - Ejecuta `source ~/.zshrc`
+
+### Linux (Ubuntu/Debian)
+1. Actualiza el sistema: `sudo apt update`
+2. Instala JDK 1.8: `sudo apt install openjdk-8-jdk`
+3. Verifica: `java -version`
+4. Las variables de entorno suelen configurarse automáticamente, pero si no, agrega a `~/.bashrc`:
+   - `export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64`
+   - `export PATH=$JAVA_HOME/bin:$PATH`
+   - Ejecuta `source ~/.bashrc`
+
 ## Instalación Local
 
 1. Clonar el repositorio
