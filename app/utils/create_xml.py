@@ -138,7 +138,7 @@ def createXml(info: Invoice, accessKeyInvoice: str):
                 infoAdicional, 'campoAdicional', attrib={'nombre': item.name})
             campoAdicional.text = item.value
 
-        xml_string = etree.tostring(root, pretty_print=True).decode('utf-8')
+        xml_string = etree.tostring(root, pretty_print=True, encoding='utf-8', xml_declaration=True).decode('utf-8')
 
         return {
             'xmlFile': root,
@@ -155,6 +155,6 @@ def createXml(info: Invoice, accessKeyInvoice: str):
 def saveXml(xml, pathToSave):
     tree = etree.ElementTree(xml)
     contenido_xml = etree.tostring(
-        tree, pretty_print=True, encoding="utf-8").decode()
-    with open(pathToSave, "w") as archivo:
+        tree, pretty_print=True, encoding="utf-8", xml_declaration=True).decode('utf-8')
+    with open(pathToSave, "w", encoding="utf-8") as archivo:
         archivo.write(contenido_xml)
