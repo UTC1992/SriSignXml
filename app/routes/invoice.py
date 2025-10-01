@@ -57,29 +57,49 @@ async def sign_invoice(invoice: Invoice):
         # sign xml and creating temp file
         isXmlCreated = sign_xml_file(infoToSignXml)
 
+        if not isXmlCreated:
+            return {
+                'result': None,
+                'error': 'Error al firmar el XML. Verifique el certificado, contraseña y formato del XML.',
+                'errorType': 'signing_error'
+            }
+
         # url for reception and authorization
         urlReception = config["URL_RECEPTION"]
         urlAuthorization = config["URL_AUTHORIZATION"]
 
         # send xml for reception
         isReceived = False
-        if isXmlCreated:
-            isReceived = await send_xml_to_reception(
-                pathXmlSigned=xmlSigned.name,
-                urlToReception=urlReception,
-            )
+        isReceived = await send_xml_to_reception(
+            pathXmlSigned=xmlSigned.name,
+            urlToReception=urlReception,
+        )
+
+        if not isReceived:
+            return {
+                'result': None,
+                'error': 'El XML fue firmado pero no fue recibido por el SRI. Verifique la conexión y el formato del XML.',
+                'errorType': 'reception_error',
+                'accessKey': accessKey
+            }
 
         # send xml for authorization
-        isAuthorized = False
-        xmlSignedValue = None
-        if isReceived:
-            responseAuthorization = await send_xml_to_authorization(
-                accessKey,
-                urlAuthorization,
-            )
-            isAuthorized = responseAuthorization['isValid']
-            # get xml signed content
-            xmlSignedValue = responseAuthorization['xml']
+        responseAuthorization = await send_xml_to_authorization(
+            accessKey,
+            urlAuthorization,
+        )
+        isAuthorized = responseAuthorization['isValid']
+        xmlSignedValue = responseAuthorization['xml']
+
+        if not isAuthorized:
+            return {
+                'result': None,
+                'error': 'El XML fue recibido pero no fue autorizado por el SRI.',
+                'errorType': 'authorization_error',
+                'accessKey': accessKey,
+                'isReceived': True,
+                'isAuthorized': False
+            }
 
         return {
             'result': {
@@ -89,6 +109,18 @@ async def sign_invoice(invoice: Invoice):
                 'xmlFileSigned': xmlSignedValue
             }
         }
+    except FileNotFoundError as e:
+        return {
+            'result': None,
+            'error': f'Archivo no encontrado: {str(e)}. Verifique que el certificado .p12 y el JAR de firma estén en su lugar.',
+            'errorType': 'file_not_found'
+        }
     except Exception as e:
-        print(e)
-        return {'result': None}
+        import logging
+        logging.critical('Error inesperado en el endpoint /invoice/sign: %s' % str(e))
+        return {
+            'result': None,
+            'error': 'Error interno del servidor. Contacte al administrador.',
+            'errorType': 'internal_error',
+            'errorDetail': str(e)
+        }

@@ -3,9 +3,9 @@ import tempfile
 
 
 def createTempXmlFile(xml, fileName):
-    # Crea un archivo temporal
-    with tempfile.NamedTemporaryFile(delete=False, suffix=fileName) as temp_file:
-        temp_file.write(xml.encode())
+    # Crea un archivo temporal con encoding UTF-8 explícito
+    with tempfile.NamedTemporaryFile(delete=False, suffix=fileName, mode='w', encoding='utf-8') as temp_file:
+        temp_file.write(xml)
 
     return temp_file
 
