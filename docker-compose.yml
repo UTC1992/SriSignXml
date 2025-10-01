@@ -1,0 +1,20 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sri_container
+    image: sri-sign-xml-open-source
+    ports:
+      - "5003:5003"
+    volumes:
+      # Mapea el código local al contenedor (desarrollo)
+      - ./app:/app/app
+      - ./main.py:/app/main.py
+      # Mapea el archivo .env
+      - ./.env:/app/.env
+    environment:
+      # Variables de entorno (alternativa al .env)
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 5003 --reload
