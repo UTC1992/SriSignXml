@@ -79,7 +79,9 @@ async def sign_invoice(invoice: Invoice):
                 'result': None,
                 'error': 'El XML fue firmado pero no fue recibido por el SRI. Verifique la conexión y el formato del XML.',
                 'errorType': 'reception_error',
-                'accessKey': access_key
+                'accessKey': access_key,
+                'isReceived': False,
+                'isAuthorized': False
             }
 
         # send xml for authorization
