@@ -1,25 +1,19 @@
-import os
-import random
 import logging
-import aiofiles
 from typing import Optional
 
 from fastapi import APIRouter, Request
 from starlette.responses import JSONResponse
+from dotenv import dotenv_values
 
-from app.models.invoice import Invoice, InfoToSignXml
-from app.models.invoice_sign_responses import (
+from app.api.schemas.invoice import Invoice
+from app.api.schemas.invoice_sign_responses import (
     InvoiceSignResultBlock,
     build_invoice_sign_problem,
     invoice_sign_problem_response,
     invoice_sign_success_response,
 )
-from app.utils.create_access_key import createAccessKey
-from app.utils.create_xml import createXml
-from app.utils.sign_xml import sign_xml_file
-from app.utils.send_xml import send_xml_to_reception, send_xml_to_authorization
-from app.utils.control_temp_file import createTempXmlFile, createTempFile
-from dotenv import dotenv_values
+from app.application.dto.sign_invoice_output import SignInvoiceOutputDto
+from app.application.services.sign_invoice_service import execute_sign_invoice
 
 router_invoice = APIRouter()
 config = {
@@ -36,44 +30,25 @@ async def sign_invoice(invoice: Invoice, request: Request) -> JSONResponse:
     instance = str(request.url)
 
     try:
-        # create access key
-        random_number = str(random.randint(1, 99999999)).zfill(8)
-        access_key = createAccessKey(
-            documentInfo=invoice.documentInfo, randomNumber=random_number)
+        # Execute application service.
+        service_result: SignInvoiceOutputDto = await execute_sign_invoice(
+            invoice=invoice,
+            config=config,
+        )
+        access_key = service_result.access_key
+        is_received = service_result.is_received
+        is_authorized = service_result.is_authorized
+        xml_signed_value = service_result.xml_signed_value
 
-        # generate xml
-        xml_data = createXml(info=invoice, accessKeyInvoice=access_key)
+        if service_result.is_success:
+            return invoice_sign_success_response(
+                access_key=access_key,
+                is_received=is_received,
+                is_authorized=is_authorized,
+                xml_file_signed=xml_signed_value,
+            )
 
-        # xml name
-        xml_file_name = str(access_key) + '.xml'
-
-        # xml string
-        xml_string = xml_data['xmlString']
-
-        # create temp files to create xml
-        xml_no_signed = createTempXmlFile(xml_string, xml_file_name)
-        xml_signed = createTempXmlFile(xml_string, xml_file_name)
-
-        # get digital signature
-        certificate_name = 'signature.p12'
-        path_signature = os.path.abspath('app/signature.p12')
-        async with aiofiles.open(path_signature, 'rb') as file:
-            digital_signature = await file.read()
-            certificate_to_sign = createTempFile(
-                digital_signature, certificate_name)
-
-        # password of signature
-        password_p12 = config['PASSWORD']
-        info_to_sign_xml = InfoToSignXml(
-            pathXmlToSign=xml_no_signed.name,
-            pathXmlSigned=xml_signed.name,
-            pathSignatureP12=certificate_to_sign.name,
-            passwordSignature=password_p12)
-
-        # sign xml and creating temp file
-        is_xml_created = sign_xml_file(info_to_sign_xml)
-
-        if not is_xml_created:
+        if service_result.error_code == 'signing_error':
             return invoice_sign_problem_response(
                 build_invoice_sign_problem(
                     status_code=500,
@@ -91,17 +66,7 @@ async def sign_invoice(invoice: Invoice, request: Request) -> JSONResponse:
                     ),
                 ))
 
-        # url for reception and authorization
-        url_reception = config["URL_RECEPTION"]
-        url_authorization = config["URL_AUTHORIZATION"]
-
-        # send xml for reception
-        is_received = await send_xml_to_reception(
-            pathXmlSigned=xml_signed.name,
-            urlToReception=url_reception,
-        )
-
-        if not is_received:
+        if service_result.error_code == 'reception_error':
             return invoice_sign_problem_response(
                 build_invoice_sign_problem(
                     status_code=502,
@@ -120,15 +85,7 @@ async def sign_invoice(invoice: Invoice, request: Request) -> JSONResponse:
                     ),
                 ))
 
-        # send xml for authorization
-        response_authorization = await send_xml_to_authorization(
-            access_key,
-            url_authorization,
-        )
-        is_authorized = response_authorization['isValid']
-        xml_signed_value = response_authorization['xml']
-
-        if not is_authorized:
+        if service_result.error_code == 'authorization_error':
             return invoice_sign_problem_response(
                 build_invoice_sign_problem(
                     status_code=422,
@@ -144,12 +101,7 @@ async def sign_invoice(invoice: Invoice, request: Request) -> JSONResponse:
                     ),
                 ))
 
-        return invoice_sign_success_response(
-            access_key=access_key,
-            is_received=is_received,
-            is_authorized=is_authorized,
-            xml_file_signed=xml_signed_value,
-        )
+        raise RuntimeError(f"Unsupported service error code: {service_result.error_code}")
 
     except FileNotFoundError as e:
         return invoice_sign_problem_response(

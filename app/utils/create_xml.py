@@ -1,7 +1,7 @@
 import json
 import xmltodict
 from lxml import etree
-from app.models.invoice import Invoice
+from app.api.schemas.invoice import Invoice
 
 
 def jsonToXml(json_str):

@@ -1,5 +1,5 @@
 from app.utils.module11 import CheckDigit
-from app.models.invoice import DocumentInfo
+from app.api.schemas.invoice import DocumentInfo
 
 
 def createAccessKey(documentInfo: DocumentInfo, randomNumber: int):

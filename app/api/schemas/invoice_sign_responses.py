@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 from starlette.responses import JSONResponse
@@ -17,10 +18,10 @@ class CamelModel(BaseModel):
 
 
 class InvoiceSignResultBlock(CamelModel):
-    access_key: str | None = None
-    is_received: bool | None = None
-    is_authorized: bool | None = None
-    xml_file_signed: str | None = None
+    access_key: Optional[str] = None
+    is_received: Optional[bool] = None
+    is_authorized: Optional[bool] = None
+    xml_file_signed: Optional[str] = None
 
 
 class InvoiceSignSuccessResponse(CamelModel):
@@ -37,10 +38,10 @@ class InvoiceSignProblemDetail(BaseModel):
     title: str
     status: int
     detail: str
-    instance: str | None = None
+    instance: Optional[str] = None
     result: InvoiceSignResultBlock
     error_code: str = Field(serialization_alias="errorCode")
-    internal_detail: str | None = Field(default=None, serialization_alias="internalDetail")
+    internal_detail: Optional[str] = Field(default=None, serialization_alias="internalDetail")
 
 
 def invoice_sign_success_response(
@@ -48,7 +49,7 @@ def invoice_sign_success_response(
     access_key: str,
     is_received: bool,
     is_authorized: bool,
-    xml_file_signed: str | None,
+    xml_file_signed: Optional[str],
 ) -> JSONResponse:
     body = InvoiceSignSuccessResponse(
         success=True,
@@ -83,9 +84,9 @@ def build_invoice_sign_problem(
     error_code: str,
     title: str,
     detail: str,
-    instance: str | None,
+    instance: Optional[str],
     result: InvoiceSignResultBlock,
-    internal_detail: str | None = None,
+    internal_detail: Optional[str] = None,
 ) -> InvoiceSignProblemDetail:
     return InvoiceSignProblemDetail(
         problem_type=f"urn:srisignxml:problem:{error_code}",
