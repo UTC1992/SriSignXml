@@ -93,6 +93,118 @@
 }
 ```
 
+---
+
+## Retry Endpoint
+
+- **Method**: `POST`
+- **Path**: `/invoice/retry`
+- **Success content type**: `application/json`
+- **Error content type**: `application/problem+json` (RFC 7807)
+
+### Request Body - Full Retry
+
+Use this mode when reception failed and you need to retry the complete flow:
+signing -> reception -> authorization.
+
+```json
+{
+  "retryMode": "full",
+  "invoice": {
+    "documentInfo": {
+      "accessKey": "string",
+      "businessName": "string",
+      "commercialName": "string",
+      "businessAddress": "string",
+      "dayEmission": "string",
+      "monthEmission": "string",
+      "yearEmission": "string",
+      "codDoc": "string",
+      "rucBusiness": "string",
+      "environment": "string",
+      "typeEmission": "string",
+      "establishment": "string",
+      "establishmentAddress": "string",
+      "emissionPoint": "string",
+      "sequential": "string",
+      "obligatedAccounting": "string"
+    },
+    "customer": {
+      "identificationType": "string",
+      "customerName": "string",
+      "customerDni": "string",
+      "customerAddress": "string"
+    },
+    "payment": {
+      "totalWithoutTaxes": "string",
+      "totalDiscount": "string",
+      "gratuity": "string",
+      "totalAmount": "string",
+      "currency": "string",
+      "paymentMethodCode": "string",
+      "totalPayment": "string"
+    },
+    "details": [
+      {
+        "productCode": "string",
+        "productName": "string",
+        "description": "string",
+        "quantity": 1,
+        "price": "string",
+        "discount": "string",
+        "subTotal": "string",
+        "taxTypeCode": "string",
+        "percentageCode": "string",
+        "rate": "string",
+        "taxableBaseTax": "string",
+        "taxValue": "string"
+      }
+    ],
+    "additionalInfo": [
+      {
+        "name": "string",
+        "value": "string"
+      }
+    ],
+    "totalsWithTax": [
+      {
+        "taxCode": "string",
+        "percentageCode": "string",
+        "taxableBase": "string",
+        "taxValue": "string"
+      }
+    ]
+  }
+}
+```
+
+### Request Body - Authorization Only Retry
+
+Use this mode when reception was already successful and only authorization must be retried.
+
+```json
+{
+  "retryMode": "authorization_only",
+  "accessKey": "010420260112345678900011001001000000001123456781"
+}
+```
+
+### Success Response
+
+`POST /invoice/retry` returns the same success payload as `/invoice/sign`:
+
+```json
+{
+  "success": true,
+  "result": {
+    "accessKey": "010420260112345678900011001001000000001123456781",
+    "isReceived": true,
+    "isAuthorized": true,
+    "xmlFileSigned": "<factura>...</factura>"
+  }
+}
+```
+
 ## Error Responses (RFC 7807)
 
 > Note: `result` values depend on the step where the flow failed. Early failures can return `null`.
@@ -190,6 +302,44 @@
   },
   "errorCode": "internal_error",
   "internalDetail": "string (solo debug, no para UI)"
+}
+```
+
+### 6) `invalid_retry_payload` - HTTP `400`
+
+```json
+{
+  "type": "urn:srisignxml:problem:invalid_retry_payload",
+  "title": "Parámetros inválidos para reintento",
+  "status": 400,
+  "detail": "Para retryMode=full debe enviar invoice; para retryMode=authorization_only debe enviar accessKey.",
+  "instance": "http://localhost:8000/invoice/retry",
+  "result": {
+    "accessKey": null,
+    "isReceived": null,
+    "isAuthorized": null,
+    "xmlFileSigned": null
+  },
+  "errorCode": "invalid_retry_payload"
+}
+```
+
+### 7) `invalid_retry_mode` - HTTP `400`
+
+```json
+{
+  "type": "urn:srisignxml:problem:invalid_retry_mode",
+  "title": "Modo de reintento inválido",
+  "status": 400,
+  "detail": "retryMode debe ser full o authorization_only.",
+  "instance": "http://localhost:8000/invoice/retry",
+  "result": {
+    "accessKey": null,
+    "isReceived": null,
+    "isAuthorized": null,
+    "xmlFileSigned": null
+  },
+  "errorCode": "invalid_retry_mode"
 }
 ```
 
