@@ -6,7 +6,7 @@ services:
     container_name: sri_container
     image: sri-sign-xml-open-source
     ports:
-      - "5003:5003"
+      - "8001:5003"
     volumes:
       # Mapea el código local al contenedor (desarrollo)
       - ./app:/app/app
