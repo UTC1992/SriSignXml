@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Literal, Optional
 
 
 class AdditionalInfo(BaseModel):
@@ -72,6 +72,12 @@ class Invoice(BaseModel):
     details: List[Detail]
     additionalInfo: List[AdditionalInfo]
     totalsWithTax: List[TotalWithTax]
+
+
+class RetryInvoiceRequest(BaseModel):
+    retryMode: Literal["full", "authorization_only"]
+    invoice: Optional[Invoice] = None
+    accessKey: Optional[str] = None
 
 
 class InfoToSignXml:

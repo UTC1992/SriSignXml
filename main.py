@@ -1,4 +1,4 @@
-from app.routes.invoice import router_invoice
+from app.api.routes.invoice import router_invoice
 from fastapi import FastAPI
 
 app = FastAPI()
