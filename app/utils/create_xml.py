@@ -1,7 +1,7 @@
 import json
 import xmltodict
 from lxml import etree
-from app.models.invoice import Invoice
+from app.api.schemas.invoice import Invoice
 
 
 def jsonToXml(json_str):
@@ -55,7 +55,10 @@ def createXml(info: Invoice, accessKeyInvoice: str):
         emissionDate.text = ''.join(emissionDateInvoice)
         dirEstablecimiento = etree.SubElement(
             infoInvoice, 'dirEstablecimiento')
-        dirEstablecimiento.text = info.documentInfo.establishmentAddress
+        dir_establecimiento_value = info.documentInfo.establishmentAddress
+        if not dir_establecimiento_value:
+            dir_establecimiento_value = info.documentInfo.businessAddress
+        dirEstablecimiento.text = dir_establecimiento_value
         obligatedAccounting = etree.SubElement(
             infoInvoice, 'obligadoContabilidad')
         obligatedAccounting.text = info.documentInfo.obligatedAccounting

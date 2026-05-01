@@ -28,6 +28,7 @@ async def send_xml_to_reception(pathXmlSigned: str, urlToReception: str):
 
 
 async def send_xml_to_authorization(accessKey: str, urlToAuthorization: str):
+    status = 'ERROR'
     try:
         async with AsyncClient(urlToAuthorization) as client:
             result = await client.service.autorizacionComprobante(accessKey)
@@ -51,7 +52,7 @@ async def send_xml_to_authorization(accessKey: str, urlToAuthorization: str):
                     'xml': None
                 }
     except Exception as e:
-        logging.error('Error to send xml for reception: %s' % str(e))
+        logging.error('Error to send access key for authorization: %s' % str(e))
         return {
             'isValid': False,
             'status': status,
