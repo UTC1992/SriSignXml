@@ -99,11 +99,18 @@ def createXml(info: Invoice, accessKeyInvoice: str):
         moneda = etree.SubElement(infoInvoice, 'moneda')
         moneda.text = info.payment.currency
         pagos = etree.SubElement(infoInvoice, 'pagos')
-        pago = etree.SubElement(pagos, 'pago')
-        formaPago = etree.SubElement(pago, 'formaPago')
-        formaPago.text = info.payment.paymentMethodCode
-        total = etree.SubElement(pago, 'total')
-        total.text = info.payment.totalPayment
+        for payment_line in info.payment.payments:
+            pago = etree.SubElement(pagos, 'pago')
+            formaPago = etree.SubElement(pago, 'formaPago')
+            formaPago.text = payment_line.paymentMethodCode
+            total = etree.SubElement(pago, 'total')
+            total.text = payment_line.total
+            if payment_line.term:
+                plazo = etree.SubElement(pago, 'plazo')
+                plazo.text = payment_line.term
+            if payment_line.termUnit:
+                unidadTiempo = etree.SubElement(pago, 'unidadTiempo')
+                unidadTiempo.text = payment_line.termUnit
 
         detalles = etree.SubElement(root, 'detalles')
         # end infoFactura

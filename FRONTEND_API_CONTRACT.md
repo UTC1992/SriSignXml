@@ -41,8 +41,14 @@
     "gratuity": "string",
     "totalAmount": "string",
     "currency": "string",
-    "paymentMethodCode": "string",
-    "totalPayment": "string"
+    "payments": [
+      {
+        "paymentMethodCode": "string",
+        "total": "string",
+        "term": "string (optional)",
+        "termUnit": "string (optional)"
+      }
+    ]
   },
   "details": [
     {
@@ -76,6 +82,14 @@
   ]
 }
 ```
+
+### Payment Rules (SRI-aligned)
+
+- `payment.payments` is required and must contain at least one item.
+- `payments[].paymentMethodCode` must be a 2-digit numeric code from SRI table 24.
+- `payments[].total` must be numeric and greater than `0`.
+- Sum of `payments[].total` must be equal to `payment.totalAmount`.
+- `payments[].term` and `payments[].termUnit` are optional, but if one is sent, both are required.
 
 ## Success Response
 
@@ -141,8 +155,14 @@ signing -> reception -> authorization.
       "gratuity": "string",
       "totalAmount": "string",
       "currency": "string",
-      "paymentMethodCode": "string",
-      "totalPayment": "string"
+      "payments": [
+        {
+          "paymentMethodCode": "string",
+          "total": "string",
+          "term": "string (optional)",
+          "termUnit": "string (optional)"
+        }
+      ]
     },
     "details": [
       {
